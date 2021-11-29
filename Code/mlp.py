@@ -37,8 +37,8 @@ class Model(tf.keras.Model):
         """
         Use our layers to predict output
 
-        :param : 
-        :returns:
+        :param: inputs: (N,5) matrix of commodities data
+        :returns: (N,1) matix
         """
         dense_out = self.dense(inputs)
         dense1_out = self.dense1(dense_out)
@@ -52,8 +52,9 @@ class Model(tf.keras.Model):
         """
         Calculate the accuracy of our model
 
-        :param :
-        :returns: 
+        :param outputs: predictions from the model
+        :param labels: (N,1) matrix of closing stock prices
+        :returns: accuracy of the batch
         """
         acc_func = tf.keras.metrics.Accuracy()
         acc_func.update_state(labels, outputs)
@@ -64,8 +65,9 @@ class Model(tf.keras.Model):
     def loss(self, outputs, labels):
         """
         Calculate the loss of our model
-        :param :
-        :returns:
+        :param outputs: predictions from the model
+        :param labels: (N,1) matrix of closing stock prices
+        :returns: loss of the batch
         """
         loss_func = tf.keras.losses.Crossentropy()
         return loss_func(labels, outputs)
