@@ -33,7 +33,7 @@ def train(model, train_commodities, train_stock):
             print(loss)
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-
+    return loss
 
 def test(model, test_commodities, test_stock):
     """
@@ -44,18 +44,27 @@ def test(model, test_commodities, test_stock):
     :param test_labels: train labels (all labels for testing) of shape (num_labels,)
     :returns: perplexity of the test set
     """
-    return 
+    return loss, accuracy
 
 def main():
     args = parse_args()
     if args.lstm:
         model = lstm
     train_stock, train_commodities, test_stock, test_commmodities = get_data(constants.stock_filepath, constants.commodities_filepaths)
+    accuracy_per_epoch = []
+    loss_per_epoch = []
     for i in range(constants.EPOCH):
         loss = train(model, train_commodities, train_stock)
-        print(f"Loss for EPOCH {i}: {loss}")
-    accuracy = test(model, test_commmodities, test_stock)
-    print(f"Accurcay after {constants.EPOCH} epochs: {accuracy}")
+        print(f"Train Loss for EPOCH {i}: {loss}")
+        test_loss, accuracy = test(model, test_commmodities, test_stock)
+        print(f"Test Loss for EPOCH {i}: {test_loss}")
+        print(f"Test Loss for EPOCH {i}: {accuracy}")
+        accuracy_per_epoch += accuracy
+        loss_per_epoch += test_loss
+    viz_loss(loss_per_epoch)
+    viz_accuracy(accuracy_per_epoch)
+    print(f"Accuracy after {constants.EPOCH} epochs: {accuracy}")
+    print(model.summary())
 
 if __name__ == "__main__":
     main()
