@@ -21,13 +21,13 @@ class Model(tf.keras.Model):
         self.num_epochs = 16
 
         # Batch size
-        self.batch_size = 2000
+        self.batch_size = 50
         
-        # Size of output size of RNN
-        self.rnn_size = 128
+        # Size of output size of LSTM
+        self.lstm_size = 64
 
         # Layers
-        self.lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(self.rnn_size))
+        self.lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(self.lstm_size))
         self.dense1 = tf.keras.layers.Dense(32, activation='relu')
         self.dense2 = tf.keras.layers.Dense(16, activation='relu')
         self.dense3 = tf.keras.layers.Dense(output_size, activation="softmax")
@@ -66,5 +66,5 @@ class Model(tf.keras.Model):
         :param :
         :returns:
         """
-        loss_func = tf.keras.losses.CategoricalCrossentropy()
+        loss_func = tf.keras.losses.Crossentropy()
         return loss_func(labels, outputs)

@@ -21,12 +21,13 @@ class Model(tf.keras.Model):
         self.num_epochs = 16
 
         # Batch size
-        self.batch_size = 2000
+        self.batch_size = 50
         
         # Size of output size of RNN
-        self.rnn_size = 128
+        self.mlp_size = 128
 
         # Layers
+        self.flatten = tf.keras.layers.Flatten()
         self.dense = tf.keras.layers.Dense(64, activation='relu')
         self.dense1 = tf.keras.layers.Dense(32, activation='relu')
         self.dense2 = tf.keras.layers.Dense(16, activation='relu')
@@ -66,5 +67,5 @@ class Model(tf.keras.Model):
         :param :
         :returns:
         """
-        loss_func = tf.keras.losses.CategoricalCrossentropy()
+        loss_func = tf.keras.losses.Crossentropy()
         return loss_func(labels, outputs)

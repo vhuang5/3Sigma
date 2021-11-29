@@ -28,16 +28,18 @@ def train(model, train_commodities, train_stock):
     :param train_labels: train labels (all labels for training) of shape (num_labels,1)
     :return: None
     """
-
+    total_loss = []
     for i in range(0,len(train_stock), model.batch_size):
-
+        batched_commodities = train_commodities[i:i+model.batch_size]
+        batched_stock = train_stock[i:i+model.batch_size]
         with tf.GradientTape() as tape:
-            pred = model(train_commodities)
-            loss = model.loss(pred, train_stock)
-            print(loss)
+            pred = model(batched_commodities)
+            loss = model.loss(pred, batched_stock)
+            total_loss += loss
+            # print(loss)
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return loss
+    return total_loss/model.batch_size
 
 def test(model, test_commodities, test_stock):
     """
@@ -48,7 +50,18 @@ def test(model, test_commodities, test_stock):
     :param test_labels: train labels (all labels for testing) of shape (num_labels,1)
     :returns: loss and  of the test set
     """
-    return loss, accuracy
+    total_loss = []
+    total_accuracy = []
+    for i in range(0,len(test_stock), model.batch_size):
+        batched_commodities = test_commodities[i:i+model.batch_size]
+        batched_stock = test_stock[i:i+model.batch_size]
+        pred = model(batched_commodities)
+        loss = model.loss(pred, batched_stock)
+        total_loss += loss
+        acc = model.accuracy(pred, batched_stock)
+        total_accuracy += acc
+        # print(loss)
+    return total_loss/model.batch_size, total_accuracy/model.batch_size
 
 def main():
     args = parse_args()
@@ -56,7 +69,7 @@ def main():
         model = lstm
     else:
         model = mlp
-    train_stock, train_commodities, test_stock, test_commmodities = get_data(constants.stock_filepath, constants.commodities_filepaths)
+    train_stock, train_commodities, test_stock, test_commmodities = get_data(constants.stock_filepath, constants.commodities_filepaths, constants.start_date_train, constants.end_date_train, constants.start_date_test, constants.end_date_test)
     accuracy_per_epoch = []
     loss_per_epoch = []
     for i in range(constants.EPOCH):
