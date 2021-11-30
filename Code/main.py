@@ -2,8 +2,8 @@ import argparse
 from preprocessing import get_data
 import tensorflow as tf
 import constants
-import lstm
-import mlp
+from lstm import LSTM
+from mlp import MLP
 from visualizations import viz_accuracy, viz_loss
 
 def parse_args():
@@ -28,12 +28,12 @@ def train(model, train_commodities, train_stock):
     :param train_labels: train labels (all labels for training) of shape (num_labels,1)
     :return: None
     """
-    total_loss = []
+    total_loss = 0
     for i in range(0,len(train_stock), model.batch_size):
         batched_commodities = train_commodities[i:i+model.batch_size]
         batched_stock = train_stock[i:i+model.batch_size]
         with tf.GradientTape() as tape:
-            pred = model(batched_commodities)
+            pred = model.call(batched_commodities)
             loss = model.loss(pred, batched_stock)
             total_loss += loss
             # print(loss)
@@ -50,12 +50,12 @@ def test(model, test_commodities, test_stock):
     :param test_labels: train labels (all labels for testing) of shape (num_labels,1)
     :returns: loss and  of the test set
     """
-    total_loss = []
-    total_accuracy = []
+    total_loss = 0
+    total_accuracy = 0
     for i in range(0,len(test_stock), model.batch_size):
         batched_commodities = test_commodities[i:i+model.batch_size]
         batched_stock = test_stock[i:i+model.batch_size]
-        pred = model(batched_commodities)
+        pred = model.call(batched_commodities)
         loss = model.loss(pred, batched_stock)
         total_loss += loss
         acc = model.accuracy(pred, batched_stock)
@@ -66,23 +66,23 @@ def test(model, test_commodities, test_stock):
 def main():
     args = parse_args()
     if args.lstm:
-        model = lstm
+        model = LSTM(50)
     else:
-        model = mlp
+        model = MLP(50)
     train_stock, train_commodities, test_stock, test_commmodities = get_data(constants.stock_filepath, constants.commodities_filepaths, constants.start_date_train, constants.end_date_train, constants.start_date_test, constants.end_date_test)
-    accuracy_per_epoch = []
-    loss_per_epoch = []
-    for i in range(constants.EPOCH):
+    accuracy = []
+    test_loss = []
+    for i in range(1, constants.EPOCH + 1):
         loss = train(model, train_commodities, train_stock)
         print(f"Train Loss for EPOCH {i}: {loss}")
-        test_loss, accuracy = test(model, test_commmodities, test_stock)
-        print(f"Test Loss for EPOCH {i}: {test_loss}")
-        print(f"Test Loss for EPOCH {i}: {accuracy}")
-        accuracy_per_epoch += accuracy
-        loss_per_epoch += test_loss
-    viz_loss(loss_per_epoch)
-    viz_accuracy(accuracy_per_epoch)
-    print(f"Accuracy after {constants.EPOCH} epochs: {accuracy}")
+        test_loss_per_epoch, accuracy_per_epoch = test(model, test_commmodities, test_stock)
+        print(f"Test Loss for EPOCH {i}: {sum(test_loss) / i}")
+        print(f"Test Accuracy for EPOCH {i}: {sum(accuracy) / i}")
+        accuracy.append(accuracy_per_epoch)
+        test_loss.append(test_loss_per_epoch)
+    viz_loss(test_loss)
+    viz_accuracy(accuracy)
+    print(f"Accuracy after {constants.EPOCH} epochs: {sum(accuracy) / constants.EPOCH}")
     print(model.summary())
 
 if __name__ == "__main__":

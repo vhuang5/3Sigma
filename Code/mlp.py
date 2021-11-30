@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import constants
 
-class Model(tf.keras.Model):
+class MLP(tf.keras.Model):
 
     def __init__(self, output_size):
         """
@@ -12,7 +12,7 @@ class Model(tf.keras.Model):
         :param
         :returns: none
         """
-        super(Model, self).__init__()
+        super(MLP, self).__init__()
         # Create out optimizer
         self.learning_rate = 0.001
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
@@ -21,7 +21,7 @@ class Model(tf.keras.Model):
         self.num_epochs = 16
 
         # Batch size
-        self.batch_size = 50
+        self.batch_size = output_size
         
         # Size of output size of RNN
         self.mlp_size = 128
@@ -69,5 +69,7 @@ class Model(tf.keras.Model):
         :param labels: (N,1) matrix of closing stock prices
         :returns: loss of the batch
         """
-        loss_func = tf.keras.losses.Crossentropy()
-        return loss_func(labels, outputs)
+        print(outputs)
+        print(labels)
+        loss_func = tf.keras.losses.MeanAbsoluteError()
+        return tf.reduce_mean(loss_func(labels, outputs))

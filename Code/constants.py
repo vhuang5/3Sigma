@@ -1,5 +1,5 @@
-stock_filepath = ""
-commodities_filepaths = {""}
+stock_filepath = "./../Data/SPY.csv"
+commodities_filepaths = "./../Data/DBC.csv"
 
 EPOCH = 16
 

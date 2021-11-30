@@ -57,15 +57,39 @@ def modify_historical(stock_data, commodities_data, start_date, end_date):
     """
     Updates both stock and commodities dataframe to include only desired historical range
     :param stock_data: dataframe containing historical SPY data
-    :param commodities_data: dataframe containing Invesco DBC ETF data
+    :param commodities_data: dataframe containing historical Invesco DBC ETF data
     :param start_date: string that represents specific date to have as first data point (inclusive)
     :param end_date: string that represents specific date to have as last data point (inclusive)
     :returns: updated stock data and commodities data
     """
+    stock_data['Date'] = str(stock_data['Date'])
+    commodities_data['Date'] = str(commodities_data['Date'])
     filtered_stock = stock_data.loc[(stock_data['Date'] >= start_date) & (stock_data['Date'] <= end_date)]
     filtered_commodities = commodities_data.loc[(commodities_data['Date'] >= start_date) & (commodities_data['Date'] <= end_date)]
     
     return filtered_stock, filtered_commodities
+
+def normalize(stock_data, commodities_data):
+    """
+    Performs Min-Max Normalization on each column of SPY and Invesco DBC dataframes
+    :param stock_data: dataframe containing SPY data
+    :param commodities_data: dataframe containing Invesco DBC ETF data
+    :returns: updated stock data and commodities data
+    """
+    stock_copy = stock_data.copy()
+    for stock_column in stock_data.columns:
+        max_val = stock_data[stock_column].max()
+        min_val = stock_data[stock_column].min()
+        stock_copy[stock_column] = (stock_data[stock_column] - min_val) / (max_val - min_val)
+    
+    commodity_copy = commodities_data.copy()
+    for commodity_column in commodities_data.columns:
+        max_val = commodities_data[commodity_column].max()
+        min_val = commodities_data[commodity_column].min()
+        commodity_copy[commodity_column] = (commodities_data[commodity_column] - min_val) / (max_val - min_val)
+    
+    return stock_copy, commodity_copy
+
 
 
 def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_date, test_start_date, test_end_date):
@@ -86,7 +110,9 @@ def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_d
 
     stock_data, commodities_data = sort_data(stock_filepath, commodities_filepath)
 
-    updated_stock_data, updated_commodities_data = drop_column(stock_data, commodities_data, 'Adj Close')
+    drop_stock, drop_commodities = drop_column(stock_data, commodities_data, 'Adj Close')
+
+    updated_stock_data, updated_commodities_data = normalize(drop_stock, drop_commodities)
 
     train_stocks, train_commodities = modify_historical(updated_stock_data, updated_commodities_data, train_start_date, train_end_date)
     test_stocks, test_commodities = modify_historical(updated_stock_data, updated_commodities_data, test_start_date, test_end_date)
