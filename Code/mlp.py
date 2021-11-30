@@ -14,14 +14,14 @@ class MLP(tf.keras.Model):
         """
         super(MLP, self).__init__()
         # Create out optimizer
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         # Set number of epochs
         self.num_epochs = 16
 
         # Batch size
-        self.batch_size = output_size
+        self.batch_size = 50
         
         # Size of output size of RNN
         self.mlp_size = 128
@@ -69,7 +69,7 @@ class MLP(tf.keras.Model):
         :param labels: (N,1) matrix of closing stock prices
         :returns: loss of the batch
         """
-        print(outputs)
-        print(labels)
+        # print(outputs)
+        # print(labels)
         loss_func = tf.keras.losses.MeanAbsoluteError()
         return tf.reduce_mean(loss_func(labels, outputs))

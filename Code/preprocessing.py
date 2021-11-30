@@ -127,5 +127,10 @@ def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_d
     test_data = tf.convert_to_tensor(np_test_commodities[:, 1:], dtype=tf.float32)
     test_labels = tf.convert_to_tensor(np_test_stocks[:, -2:-1], dtype=tf.float32)
 
+    # print(train_data.shape)
+    # print(train_labels.shape)
+    # print(test_data.shape)
+    # print(test_labels.shape)
+
     return train_data, train_labels, test_data, test_labels
 

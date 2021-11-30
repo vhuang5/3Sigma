@@ -14,14 +14,14 @@ class LSTM(tf.keras.Model):
         """
         super(LSTM, self).__init__()
         # Create out optimizer
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         # Set number of epochs
         self.num_epochs = 16
 
         # Batch size
-        self.batch_size = output_size
+        self.batch_size = 50
         
         # Size of output size of LSTM
         self.lstm_size = 64
