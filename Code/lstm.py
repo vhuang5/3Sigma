@@ -30,7 +30,7 @@ class LSTM(tf.keras.Model):
         self.lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(self.lstm_size))
         self.dense1 = tf.keras.layers.Dense(32, activation='relu')
         self.dense2 = tf.keras.layers.Dense(16, activation='relu')
-        self.dense3 = tf.keras.layers.Dense(output_size, activation="softmax")
+        self.dense3 = tf.keras.layers.Dense(output_size, activation='relu')
         
     def call(self, inputs):
         """

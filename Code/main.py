@@ -24,7 +24,7 @@ def train(model, train_commodities, train_stock):
     Runs through x epochs - all training examples.
 
     :param model: the initilized model to use for forward and backward pass
-    :param train_inputs: train inputs (all inputs for training) of shape (num_inputs,)
+    :param train_inputs: train inputs (all inputs for training) of shape (num_inputs,5)
     :param train_labels: train labels (all labels for training) of shape (num_labels,1)
     :return: None
     """
@@ -46,7 +46,7 @@ def test(model, test_commodities, test_stock):
     Runs through x epochs - all testing examples
 
     :param model: the trained model to use for prediction
-    :param test_inputs: train inputs (all inputs for testing) of shape (num_inputs,)
+    :param test_inputs: train inputs (all inputs for testing) of shape (num_inputs,5)
     :param test_labels: train labels (all labels for testing) of shape (num_labels,1)
     :returns: loss and  of the test set
     """
