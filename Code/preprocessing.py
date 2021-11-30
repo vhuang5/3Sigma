@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import constants
+import tensorflow as tf
 
 def csv_data(filepath):
     """
@@ -9,7 +10,7 @@ def csv_data(filepath):
     :returns: pd df from the csv file
     """
 
-    csv_data = pd.read_csv(filepath, parse_dates=["Date"])
+    csv_data = pd.read_csv(filepath, parse_dates=['Date'])
     return csv_data
 
 def sort_data(stock_filepath, commodities_filepath):
@@ -62,8 +63,6 @@ def modify_historical(stock_data, commodities_data, start_date, end_date):
     :param end_date: string that represents specific date to have as last data point (inclusive)
     :returns: updated stock data and commodities data
     """
-    stock_data['Date'] = str(stock_data['Date'])
-    commodities_data['Date'] = str(commodities_data['Date'])
     filtered_stock = stock_data.loc[(stock_data['Date'] >= start_date) & (stock_data['Date'] <= end_date)]
     filtered_commodities = commodities_data.loc[(commodities_data['Date'] >= start_date) & (commodities_data['Date'] <= end_date)]
     
@@ -110,22 +109,23 @@ def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_d
 
     stock_data, commodities_data = sort_data(stock_filepath, commodities_filepath)
 
-    drop_stock, drop_commodities = drop_column(stock_data, commodities_data, 'Adj Close')
-
-    updated_stock_data, updated_commodities_data = normalize(drop_stock, drop_commodities)
+    updated_stock_data, updated_commodities_data = drop_column(stock_data, commodities_data, 'Adj Close')
 
     train_stocks, train_commodities = modify_historical(updated_stock_data, updated_commodities_data, train_start_date, train_end_date)
     test_stocks, test_commodities = modify_historical(updated_stock_data, updated_commodities_data, test_start_date, test_end_date)
 
-    np_train_stocks = train_stocks.to_numpy()
-    np_train_commodities = train_commodities.to_numpy()
-    np_test_stocks = test_stocks.to_numpy()
-    np_test_commodities = test_commodities.to_numpy()
+    norm_train_stocks, norm_train_commodities = normalize(train_stocks, train_commodities)
+    norm_test_stocks, norm_test_commodities = normalize(test_stocks, test_commodities)
 
-    train_data = np_train_commodities[:, 1:]
-    train_labels = np_train_stocks[:, -2:-1]
-    test_data = np_test_commodities[:, 1:]
-    test_labels = np_test_stocks[:, -2:-1]
+    np_train_stocks = norm_train_stocks.to_numpy()
+    np_train_commodities = norm_train_commodities.to_numpy()
+    np_test_stocks = norm_test_stocks.to_numpy()
+    np_test_commodities = norm_test_commodities.to_numpy()
+
+    train_data = tf.convert_to_tensor(np_train_commodities[:, 1:], dtype=tf.float32)
+    train_labels = tf.convert_to_tensor(np_train_stocks[:, -2:-1], dtype=tf.float32)
+    test_data = tf.convert_to_tensor(np_test_commodities[:, 1:], dtype=tf.float32)
+    test_labels = tf.convert_to_tensor(np_test_stocks[:, -2:-1], dtype=tf.float32)
 
     return train_data, train_labels, test_data, test_labels
 
