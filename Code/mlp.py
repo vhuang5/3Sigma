@@ -28,9 +28,9 @@ class MLP(tf.keras.Model):
 
         # Layers
         self.flatten = tf.keras.layers.Flatten()
-        self.dense = tf.keras.layers.Dense(64, activation='relu')
-        self.dense1 = tf.keras.layers.Dense(32, activation='relu')
-        # self.dense2 = tf.keras.layers.Dense(16, activation='relu')
+        self.dense = tf.keras.layers.Dense(6, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(4, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(2, activation='relu')
         self.dense3 = tf.keras.layers.Dense(output_size, activation='relu')
         
     def call(self, inputs):
@@ -42,9 +42,9 @@ class MLP(tf.keras.Model):
         """
         dense_out = self.dense(inputs)
         dense1_out = self.dense1(dense_out)
-        # dense2_out = self.dense2(dense1_out)
+        dense2_out = self.dense2(dense1_out)
 
-        dense3_out = self.dense3(dense1_out)
+        dense3_out = self.dense3(dense2_out)
         
         return dense3_out
         
