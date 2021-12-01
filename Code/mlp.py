@@ -14,24 +14,21 @@ class MLP(tf.keras.Model):
         """
         super(MLP, self).__init__()
         # Create out optimizer
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
-        # Set number of epochs
-        self.num_epochs = 16
-
         # Batch size
-        self.batch_size = 50
+        self.batch_size = 100
         
         # Size of output size of RNN
-        self.mlp_size = 128
+        self.mlp_size = 32
 
         # Layers
         self.flatten = tf.keras.layers.Flatten()
-        self.dense = tf.keras.layers.Dense(6, activation='relu')
-        self.dense1 = tf.keras.layers.Dense(4, activation='relu')
-        self.dense2 = tf.keras.layers.Dense(2, activation='relu')
-        self.dense3 = tf.keras.layers.Dense(output_size, activation='relu')
+        self.dense = tf.keras.layers.Dense(self.mlp_size, activation='relu', kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.05))
+        self.dense1 = tf.keras.layers.Dense(16, activation='relu', kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.05))
+        self.dense2 = tf.keras.layers.Dense(8, activation='relu')
+        self.dense3 = tf.keras.layers.Dense(output_size, activation='relu', kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.05))
         
     def call(self, inputs):
         """

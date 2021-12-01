@@ -14,11 +14,8 @@ class LSTM(tf.keras.Model):
         """
         super(LSTM, self).__init__()
         # Create out optimizer
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
-
-        # Set number of epochs
-        self.num_epochs = 16
 
         # Batch size
         self.batch_size = 50
@@ -27,24 +24,24 @@ class LSTM(tf.keras.Model):
         self.lstm_size = 64
 
         # Layers
-        self.lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(self.lstm_size))
+        self.lstm = tf.keras.layers.LSTM(self.lstm_size, return_sequences=True, return_state=True)
         self.dense1 = tf.keras.layers.Dense(32, activation='relu')
         self.dense2 = tf.keras.layers.Dense(16, activation='relu')
         self.dense3 = tf.keras.layers.Dense(output_size, activation='relu')
         
-    def call(self, inputs):
+    def call(self, inputs, initial_state=None):
         """
         Use our layers to predict output
 
         :param: inputs: (N,5) matrix of commodities data
         :returns: (N,1) matix
         """
-        lstm_out = self.lstm(inputs)
+        lstm_out, state_h, state_c = self.lstm(inputs, initial_state = initial_state)
         dense1_out = self.dense1(lstm_out)
         dense2_out = self.dense2(dense1_out)
 
         dense3_out = self.dense3(dense2_out)
-        
+        # print(dense3_out.shape)
         return dense3_out
         
     def accuracy(self, outputs, labels):

@@ -109,10 +109,20 @@ def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_d
 
     stock_data, commodities_data = sort_data(stock_filepath, commodities_filepath)
 
-    updated_stock_data, updated_commodities_data = drop_column(stock_data, commodities_data, 'Adj Close')
+    updated_stock_data, updated_commodities_data = drop_column(stock_data, commodities_data, 'Close')
+    #testing different inputs
+    updated_commodities_data = commodities_data.drop(columns = ["Close"], axis = 1)
+    prelim_data = updated_commodities_data.drop(columns = ["Open", "High", "Low", "Volume"], axis = 1)
+    ret_stock_data = updated_stock_data.drop(columns = ["Open", "High", "Low", "Volume"], axis = 1)
+    # print(prelim_data.shape)
 
+    ret_stock_data, prelim_data= modify_historical(ret_stock_data, prelim_data, train_start_date, test_end_date)
     train_stocks, train_commodities = modify_historical(updated_stock_data, updated_commodities_data, train_start_date, train_end_date)
     test_stocks, test_commodities = modify_historical(updated_stock_data, updated_commodities_data, test_start_date, test_end_date)
+
+    #input testing
+    prelim_data = prelim_data.drop(columns = "Date", axis = 1)
+    ret_stock_data = ret_stock_data.drop(columns = "Date", axis = 1)
 
     norm_train_stocks, norm_train_commodities = normalize(train_stocks, train_commodities)
     norm_test_stocks, norm_test_commodities = normalize(test_stocks, test_commodities)
@@ -122,15 +132,21 @@ def get_data(stock_filepath, commodities_filepath, train_start_date, train_end_d
     np_test_stocks = norm_test_stocks.to_numpy()
     np_test_commodities = norm_test_commodities.to_numpy()
 
+    #input testing
+    prelim_data = prelim_data.to_numpy()
+    ret_stock_data = ret_stock_data.to_numpy()
+
     train_data = tf.convert_to_tensor(np_train_commodities[:, 1:], dtype=tf.float32)
     train_labels = tf.convert_to_tensor(np_train_stocks[:, -2:-1], dtype=tf.float32)
     test_data = tf.convert_to_tensor(np_test_commodities[:, 1:], dtype=tf.float32)
     test_labels = tf.convert_to_tensor(np_test_stocks[:, -2:-1], dtype=tf.float32)
 
+    # print(ret_stock_data.shape)
+    # print(prelim_data.shape)
     # print(train_data.shape)
     # print(train_labels.shape)
     # print(test_data.shape)
     # print(test_labels.shape)
 
-    return train_data, train_labels, test_data, test_labels
+    return train_data, train_labels, test_data, test_labels, prelim_data, ret_stock_data
 
